@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kartik Joshi — Growth Marketer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080808;
+    --bg2: #0f0f0f;
+    --bg3: #161616;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0ede8;
+    --muted: #6b6860;
+    --accent: #e8ff47;
+    --accent2: #ff6b35;
+    --white: #ffffff;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(232,255,71,0.4);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.15s ease;
+  }
+  body:has(a:hover) .cursor, body:has(button:hover) .cursor { width: 20px; height: 20px; }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.35;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 24px 48px;
+    z-index: 100;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s, background 0.3s, backdrop-filter 0.3s;
+  }
+  nav.scrolled {
+    border-color: var(--border);
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(16px);
+  }
+  .nav-logo {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 36px; }
+  .nav-links a {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-cta {
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--bg); background: var(--accent);
+    border: none; padding: 10px 20px;
+    cursor: none; text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg-number {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(200px, 28vw, 400px);
+    font-weight: 800;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.03);
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    letter-spacing: -0.05em;
+  }
+  .hero-eyebrow {
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 32px; height: 1px;
+    background: var(--accent);
+  }
+  .hero-headline {
+    font-size: clamp(48px, 8vw, 120px);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.35s forwards;
+  }
+  .hero-headline .line2 {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-headline .line3 { color: var(--muted); }
+  .hero-bottom {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s forwards;
+  }
+  .hero-bio {
+    max-width: 480px;
+    font-size: 15px; line-height: 1.7;
+    color: rgba(240,237,232,0.6);
+    font-weight: 400;
+  }
+  .hero-bio strong { color: var(--text); font-weight: 600; }
+  .hero-stats {
+    display: flex; gap: 48px;
+  }
+  .stat-item { text-align: right; }
+  .stat-num {
+    display: block;
+    font-size: 32px; font-weight: 800;
+    color: var(--accent); line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .stat-label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* MARQUEE */
+  .marquee-wrap {
+    background: var(--accent);
+    overflow: hidden;
+    padding: 14px 0;
+    position: relative;
+  }
+  .marquee-track {
+    display: flex; gap: 0;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+    width: max-content;
+  }
+  .marquee-item {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--bg);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 32px;
+  }
+  .marquee-item::after {
+    content: '✦';
+    font-size: 8px;
+  }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* SECTIONS */
+  section { padding: 120px 48px; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--accent);
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 64px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1; max-width: 60px;
+    height: 1px; background: var(--accent);
+    opacity: 0.4;
+  }
+
+  /* WORK */
+  .work { background: var(--bg); }
+  .work-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .work-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+    transition: background 0.3s, border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .work-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--accent);
+    transition: height 0.4s ease;
+  }
+  .work-card:hover { background: var(--bg3); border-color: rgba(232,255,71,0.15); }
+  .work-card:hover::before { height: 100%; }
+  .work-card-left {}
+  .card-index {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.1em; margin-bottom: 16px;
+  }
+  .card-brand {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 26px; font-weight: 700;
+    line-height: 1.2; letter-spacing: -0.01em;
+    margin-bottom: 20px;
+  }
+  .card-tags {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+  }
+  .work-card-right {}
+  .card-desc {
+    font-size: 15px; line-height: 1.75;
+    color: rgba(240,237,232,0.6);
+    margin-bottom: 32px;
+  }
+  .metrics-row {
+    display: flex; gap: 32px; flex-wrap: wrap;
+  }
+  .metric {
+    border-left: 2px solid var(--accent);
+    padding-left: 16px;
+  }
+  .metric-val {
+    display: block;
+    font-size: 28px; font-weight: 800;
+    color: var(--text); line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .metric-val span { color: var(--accent); }
+  .metric-desc {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* SKILLS */
+  .skills { background: var(--bg2); }
+  .skills-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .skills-intro h2 {
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  .skills-intro h2 em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-weight: 400;
+    color: var(--accent);
+  }
+  .skills-intro p {
+    font-size: 15px; line-height: 1.7;
+    color: rgba(240,237,232,0.55);
+  }
+  .skills-categories { display: flex; flex-direction: column; gap: 40px; }
+  .skill-cat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .skill-cat-label::before {
+    content: ''; width: 6px; height: 6px;
+    background: var(--accent); border-radius: 50%;
+  }
+  .skill-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .skill-pill {
+    font-size: 13px; font-weight: 600;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: var(--bg);
+    transition: all 0.2s;
+  }
+  .skill-pill:hover {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  /* ABOUT */
+  .about { background: var(--bg); }
+  .about-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .about-left h2 {
+    font-size: clamp(32px, 4vw, 56px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+  }
+  .about-left h2 em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-weight: 400;
+    color: var(--accent);
+  }
+  .about-body {
+    font-size: 16px; line-height: 1.8;
+    color: rgba(240,237,232,0.65);
+    margin-bottom: 48px;
+  }
+  .about-body strong { color: var(--text); font-weight: 600; }
+  .about-ctas { display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn-primary {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--bg); background: var(--accent);
+    border: none; padding: 14px 28px;
+    text-decoration: none; cursor: none;
+    transition: opacity 0.2s;
+    display: inline-block;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 14px 28px;
+    text-decoration: none; cursor: none;
+    transition: border-color 0.2s, color 0.2s;
+    display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--text); }
+  .about-right {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .exp-item {
+    padding: 28px 32px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    transition: border-color 0.2s;
+  }
+  .exp-item:hover { border-color: rgba(232,255,71,0.2); }
+  .exp-top {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; margin-bottom: 8px;
+  }
+  .exp-role {
+    font-size: 15px; font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .exp-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; color: var(--muted);
+    letter-spacing: 0.08em; white-space: nowrap;
+    margin-left: 16px;
+  }
+  .exp-company {
+    font-size: 12px; color: var(--accent);
+    font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .exp-desc {
+    font-size: 13px; color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* CONTACT */
+  .contact {
+    background: var(--accent);
+    padding: 120px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .contact::before {
+    content: 'HIRE ME';
+    position: absolute;
+    right: -20px; top: 50%;
+    transform: translateY(-50%);
+    font-size: clamp(80px, 14vw, 180px);
+    font-weight: 800; letter-spacing: -0.04em;
+    color: rgba(0,0,0,0.07);
+    pointer-events: none; user-select: none;
+    white-space: nowrap;
+  }
+  .contact-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative; z-index: 1;
+  }
+  .contact-left {}
+  .contact-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+  }
+  .contact-headline {
+    font-size: clamp(36px, 6vw, 80px);
+    font-weight: 800; letter-spacing: -0.03em;
+    color: var(--bg); line-height: 1;
+    margin-bottom: 32px;
+  }
+  .contact-headline em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-weight: 400;
+  }
+  .contact-email {
+    font-size: 18px; font-weight: 600;
+    color: var(--bg);
+    text-decoration: none;
+    border-bottom: 2px solid rgba(0,0,0,0.3);
+    padding-bottom: 2px;
+    transition: border-color 0.2s;
+  }
+  .contact-email:hover { border-color: var(--bg); }
+  .contact-right {
+    display: flex; flex-direction: column;
+    gap: 16px; align-items: flex-end;
+  }
+  .contact-link {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--bg); text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+    transition: gap 0.2s;
+  }
+  .contact-link:hover { gap: 16px; }
+  .contact-link::after { content: '→'; }
+
+  /* FOOTER */
+  footer {
+    background: var(--bg);
+    padding: 32px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid var(--border);
+  }
+  .footer-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em;
+    color: var(--muted); text-transform: uppercase;
+  }
+  .footer-back {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em;
+    color: var(--muted); text-transform: uppercase;
+    text-decoration: none; cursor: none;
+    transition: color 0.2s;
+  }
+  .footer-back:hover { color: var(--accent); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 0 24px 60px; }
+    .hero-bottom { flex-direction: column; gap: 40px; align-items: flex-start; }
+    .hero-stats { gap: 32px; }
+    .stat-item { text-align: left; }
+    section { padding: 80px 24px; }
+    .work-card { grid-template-columns: 1fr; gap: 32px; padding: 32px 24px; }
+    .skills-layout { grid-template-columns: 1fr; gap: 48px; }
+    .about-layout { grid-template-columns: 1fr; gap: 48px; }
+    .contact { padding: 80px 24px; }
+    .contact-layout { flex-direction: column; gap: 40px; align-items: flex-start; }
+    footer { padding: 24px; flex-direction: column; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a class="nav-logo" href="#">Kartik<span>.</span></a>
+  <div class="nav-links">
+    <a href="#work">Work</a>
+    <a href="#skills">Skills</a>
+    <a href="#about">About</a>
+  </div>
+  <a class="nav-cta" href="mailto:kartikjoshi305@gmail.com">Get in Touch</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg-number">3+</div>
+  <div class="hero-eyebrow">Growth Marketer · Chandigarh, India</div>
+  <h1 class="hero-headline">
+    <span class="line1">Building Demand,</span><br>
+    <span class="line2">Not Just Leads.</span><br>
+    <span class="line3">Growth × Creative × Performance</span>
+  </h1>
+  <div class="hero-bottom">
+    <p class="hero-bio">
+      <strong>Brand-led growth marketing</strong> rooted in consumer psychology and classic brand principles. I create ideas that <strong>earn attention first</strong>, then use paid channels as a distribution engine — not a shortcut.
+    </p>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">2Cr+</span>
+        <span class="stat-label">Monthly Reach</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">350+</span>
+        <span class="stat-label">Sign-ups Driven</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">3+</span>
+        <span class="stat-label">Years XP</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item">Meta Ads</div>
+    <div class="marquee-item">Growth Strategy</div>
+    <div class="marquee-item">Creative Strategy</div>
+    <div class="marquee-item">Social Media</div>
+    <div class="marquee-item">Performance Marketing</div>
+    <div class="marquee-item">Content Systems</div>
+    <div class="marquee-item">Funnel Optimisation</div>
+    <div class="marquee-item">D2C Brands</div>
+    <div class="marquee-item">Meta Ads</div>
+    <div class="marquee-item">Growth Strategy</div>
+    <div class="marquee-item">Creative Strategy</div>
+    <div class="marquee-item">Social Media</div>
+    <div class="marquee-item">Performance Marketing</div>
+    <div class="marquee-item">Content Systems</div>
+    <div class="marquee-item">Funnel Optimisation</div>
+    <div class="marquee-item">D2C Brands</div>
+  </div>
+</div>
+
+<!-- WORK -->
+<section class="work" id="work">
+  <div class="section-label">Selected Work</div>
+  <div class="work-grid">
+
+    <!-- Card 1 -->
+    <div class="work-card reveal">
+      <div class="work-card-left">
+        <div class="card-index">01 / 04</div>
+        <div class="card-brand">Boss International Studies</div>
+        <div class="card-title">Full-Funnel Performance Overhaul</div>
+        <div class="card-tags">
+          <span class="tag">Meta Ads</span>
+          <span class="tag">Performance</span>
+          <span class="tag">Creative Strategy</span>
+          <span class="tag">Lead Gen</span>
+        </div>
+      </div>
+      <div class="work-card-right">
+        <p class="card-desc">Led a complete performance marketing overhaul for a student visa & international education brand. Transitioned from reactive social content to a full-funnel growth engine — owning TOFU awareness and BOFU conversion simultaneously. Improved lead quality through creative testing, audience segmentation, and messaging refinement on Meta.</p>
+        <div class="metrics-row">
+          <div class="metric">
+            <span class="metric-val">↓ <span>CPL</span></span>
+            <span class="metric-desc">Reduced Cost Per Lead</span>
+          </div>
+          <div class="metric">
+            <span class="metric-val">2<span>Cr+</span></span>
+            <span class="metric-desc">Monthly Instagram Reach</span>
+          </div>
+          <div class="metric">
+            <span class="metric-val">10<span>K+</span></span>
+            <span class="metric-desc">Genuine Followers Added</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="work-card reveal">
+      <div class="work-card-left">
+        <div class="card-index">02 / 04</div>
+        <div class="card-brand">Elite Power Sports</div>
+        <div class="card-title">Organic Content Engine — YouTube & Social</div>
+        <div class="card-tags">
+          <span class="tag">YouTube</span>
+          <span class="tag">Organic Growth</span>
+          <span class="tag">Content Strategy</span>
+          <span class="tag">Brand Storytelling</span>
+        </div>
+      </div>
+      <div class="work-card-right">
+        <p class="card-desc">Built and executed a content-driven marketing system for a sports brand from the ground up. Managed full content calendars across platforms, planned and produced YouTube live & recorded content, and drove mid-funnel engagement through reels, product storytelling, and blog initiatives — all entirely organic.</p>
+        <div class="metrics-row">
+          <div class="metric">
+            <span class="metric-val">328<span>K+</span></span>
+            <span class="metric-desc">YouTube Views (Organic)</span>
+          </div>
+          <div class="metric">
+            <span class="metric-val">24.8<span>K</span></span>
+            <span class="metric-desc">Watch Hours</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="work-card reveal">
+      <div class="work-card-left">
+        <div class="card-index">03 / 04</div>
+        <div class="card-brand">KG Cricket · RXN Sports</div>
+        <div class="card-title">Growth Consulting for Micro D2C Sports Brands</div>
+        <div class="card-tags">
+          <span class="tag">D2C Growth</span>
+          <span class="tag">Paid & Organic</span>
+          <span class="tag">Influencer</span>
+          <span class="tag">Product Launches</span>
+        </div>
+      </div>
+      <div class="work-card-right">
+        <p class="card-desc">Consulted niche D2C sports brands on end-to-end growth strategy. Developed paid and organic playbooks, consulted on product launches, activated influencer collaborations aligned to niche sports audiences, and applied an experimentation-first approach to creatives and targeting to identify scalable growth channels.</p>
+        <div class="metrics-row">
+          <div class="metric">
+            <span class="metric-val">↑ Reach</span>
+            <span class="metric-desc">Improved Brand Visibility</span>
+          </div>
+          <div class="metric">
+            <span class="metric-val">↑ Sales</span>
+            <span class="metric-desc">Product Revenue Growth</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="work-card reveal">
+      <div class="work-card-left">
+        <div class="card-index">04 / 04</div>
+        <div class="card-brand">Jigsaw Olympiad · HCL × Times of India</div>
+        <div class="card-title">Student Acquisition Campaign</div>
+        <div class="card-tags">
+          <span class="tag">Event Marketing</span>
+          <span class="tag">Influencer Targeting</span>
+          <span class="tag">Community</span>
+        </div>
+      </div>
+      <div class="work-card-right">
+        <p class="card-desc">Drove student acquisition for a national-level Olympiad backed by HCL and Times of India. Used school outreach and targeted influencer campaigns to generate sign-ups — managing both the community engagement layer and paid distribution strategy in parallel.</p>
+        <div class="metrics-row">
+          <div class="metric">
+            <span class="metric-val">350<span>+</span></span>
+            <span class="metric-desc">Student Sign-ups Driven</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="skills" id="skills">
+  <div class="section-label">Capabilities</div>
+  <div class="skills-layout">
+    <div class="skills-intro reveal">
+      <h2>Sharp on<br><em>strategy.</em><br>Ruthless on<br>execution.</h2>
+      <p>I sit at the intersection of brand thinking, creative production, and data-driven distribution — which means I can own campaigns end-to-end, not just hand off briefs.</p>
+    </div>
+    <div class="skills-categories reveal">
+      <div>
+        <div class="skill-cat-label">Performance & Paid</div>
+        <div class="skill-pills">
+          <span class="skill-pill">Meta Ads</span>
+          <span class="skill-pill">Google Ads</span>
+          <span class="skill-pill">Campaign Optimisation</span>
+          <span class="skill-pill">CPL Reduction</span>
+          <span class="skill-pill">Audience Targeting</span>
+          <span class="skill-pill">A/B Creative Testing</span>
+        </div>
+      </div>
+      <div>
+        <div class="skill-cat-label">Social & Content</div>
+        <div class="skill-pills">
+          <span class="skill-pill">Instagram Growth</span>
+          <span class="skill-pill">YouTube Strategy</span>
+          <span class="skill-pill">Reels / Shorts</span>
+          <span class="skill-pill">Content Calendars</span>
+          <span class="skill-pill">Community Building</span>
+          <span class="skill-pill">Influencer Collab</span>
+        </div>
+      </div>
+      <div>
+        <div class="skill-cat-label">Strategy & Systems</div>
+        <div class="skill-pills">
+          <span class="skill-pill">Funnel Strategy</span>
+          <span class="skill-pill">Brand Positioning</span>
+          <span class="skill-pill">Creative Strategy</span>
+          <span class="skill-pill">Growth Loops</span>
+          <span class="skill-pill">Consumer Psychology</span>
+          <span class="skill-pill">Storytelling Frameworks</span>
+        </div>
+      </div>
+      <div>
+        <div class="skill-cat-label">Tools & Analytics</div>
+        <div class="skill-pills">
+          <span class="skill-pill">Meta Business Suite</span>
+          <span class="skill-pill">GA4</span>
+          <span class="skill-pill">Notion</span>
+          <span class="skill-pill">Canva / Figma</span>
+          <span class="skill-pill">Data Analysis</span>
+          <span class="skill-pill">Looker Studio</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="section-label">About</div>
+  <div class="about-layout">
+    <div class="about-left reveal">
+      <h2>Where <em>brand</em> meets performance.</h2>
+      <p class="about-body">
+        I'm a <strong>brand-led growth marketer</strong> with 3+ years of experience building demand through clear positioning, compelling storytelling, creative strategy and performance-driven distribution.<br><br>
+        My approach to marketing is rooted in <strong>consumer psychology and classic brand principles</strong> — creating ideas that earn attention first, and using paid channels as a distribution engine, not a shortcut.<br><br>
+        I've worked across <strong>education, D2C sports, events and service-based brands</strong>, partnering closely with founders and teams to build scalable content systems, sharper narratives, and sustainable growth loops — always balancing creative thinking with performance accountability.
+      </p>
+      <div class="about-ctas">
+        <a class="btn-primary" href="mailto:kartikjoshi305@gmail.com">Let's Talk</a>
+        <a class="btn-secondary" href="https://www.linkedin.com/in/kart7ik" target="_blank">LinkedIn ↗</a>
+      </div>
+    </div>
+    <div class="about-right reveal">
+      <div class="exp-item">
+        <div class="exp-top">
+          <div class="exp-role">Digital Marketing & Content Manager</div>
+          <div class="exp-date">Aug 2024 – Present</div>
+        </div>
+        <div class="exp-company">Boss International Studies</div>
+        <div class="exp-desc">Full-funnel growth ownership — from TOFU Instagram content to BOFU Meta lead gen campaigns. CPL reduction, creative strategy, and brand perception.</div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-top">
+          <div class="exp-role">Digital Media Executive</div>
+          <div class="exp-date">Sep 2022 – Aug 2024</div>
+        </div>
+        <div class="exp-company">Elite Power Sports</div>
+        <div class="exp-desc">Built organic content engine from scratch. 328K+ YouTube views, 24.8K watch hours, full content calendar ownership across platforms.</div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-top">
+          <div class="exp-role">Growth Marketing Consultant</div>
+          <div class="exp-date">Ongoing</div>
+        </div>
+        <div class="exp-company">KG Cricket · RXN Sports</div>
+        <div class="exp-desc">End-to-end growth strategy for micro D2C sports brands. Paid + organic, influencer collaborations, product launches, creative experimentation.</div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-top">
+          <div class="exp-role">BCA · Minor in Data Science</div>
+          <div class="exp-date">Lovely Professional University</div>
+        </div>
+        <div class="exp-company">Education · CGPA 8.54</div>
+        <div class="exp-desc">IBM Data Science Orientation (Coursera) · McKinsey.org Forward Program</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-layout">
+    <div class="contact-left">
+      <div class="contact-label">Open to Opportunities</div>
+      <h2 class="contact-headline">Let's build<br><em>something</em><br>real.</h2>
+      <a class="contact-email" href="mailto:kartikjoshi305@gmail.com">kartikjoshi305@gmail.com</a>
+    </div>
+    <div class="contact-right">
+      <a class="contact-link" href="https://www.linkedin.com/in/kart7ik" target="_blank">LinkedIn</a>
+      <a class="contact-link" href="tel:+916397684617">+91 6397684617</a>
+      <a class="contact-link" href="mailto:kartikjoshi305@gmail.com">Send Email</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">© 2025 Kartik Joshi · Chandigarh, India</div>
+  <a class="footer-back" href="#home">Back to Top ↑</a>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animateCursor() {
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => io.observe(el));
+</script>
+</body>
+</html>

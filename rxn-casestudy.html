@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RXN Sports — Case Study · Kartik Joshi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080808;
+    --bg2: #0f0f0f;
+    --bg3: #161616;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0ede8;
+    --muted: #6b6860;
+    --accent: #e8ff47;
+    --accent2: #ff4d1c;
+    --white: #ffffff;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* grain */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 1000; opacity: 0.3;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 52px; height: 64px;
+    background: rgba(8,8,8,0.9);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+  .nav-back {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--accent); }
+  .nav-back::before { content: '←'; }
+  .nav-brand {
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text);
+  }
+  .nav-brand span { color: var(--accent); }
+  .nav-hire {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--bg); background: var(--accent);
+    padding: 9px 18px; text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .nav-hire:hover { opacity: 0.85; }
+
+  /* HERO */
+  .case-hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 52px 80px;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg-text {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(120px, 20vw, 280px);
+    font-weight: 800; color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.025);
+    pointer-events: none; user-select: none;
+    white-space: nowrap; letter-spacing: -0.04em;
+  }
+  .hero-overline {
+    display: flex; align-items: center; gap: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 24px;
+    opacity: 0; animation: fadeUp 0.7s 0.1s forwards;
+  }
+  .hero-overline .dot { width: 6px; height: 6px; background: var(--accent2); border-radius: 50%; }
+  .case-hero h1 {
+    font-size: clamp(52px, 9vw, 130px);
+    font-weight: 800; line-height: 0.9;
+    letter-spacing: -0.04em; margin-bottom: 52px;
+    opacity: 0; animation: fadeUp 0.7s 0.25s forwards;
+  }
+  .case-hero h1 .brand { color: var(--accent); display: block; }
+  .case-hero h1 .sub {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400; font-style: italic;
+    color: var(--muted); font-size: 0.65em;
+    display: block; margin-top: 8px;
+  }
+  .hero-meta {
+    display: flex; gap: 0;
+    border: 1px solid var(--border);
+    opacity: 0; animation: fadeUp 0.7s 0.4s forwards;
+    width: fit-content;
+  }
+  .hero-meta-item {
+    padding: 20px 32px;
+    border-right: 1px solid var(--border);
+  }
+  .hero-meta-item:last-child { border-right: none; }
+  .meta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .meta-val {
+    font-size: 15px; font-weight: 700; color: var(--text);
+  }
+
+  /* SUMMARY STRIP */
+  .summary-strip {
+    background: var(--accent);
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    border-top: 1px solid rgba(0,0,0,0.1);
+  }
+  .sum-item {
+    padding: 28px 24px;
+    border-right: 1px solid rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  .sum-item:last-child { border-right: none; }
+  .sum-val {
+    display: block;
+    font-size: clamp(20px, 2.5vw, 30px);
+    font-weight: 800; color: #080808;
+    letter-spacing: -0.02em; line-height: 1;
+    margin-bottom: 4px;
+  }
+  .sum-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: rgba(8,8,8,0.55);
+  }
+
+  /* SECTIONS */
+  .cs-section {
+    max-width: 1200px; margin: 0 auto;
+    padding: 100px 52px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cs-section:last-of-type { border-bottom: none; }
+
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-num::after {
+    content: ''; flex: 1; max-width: 40px;
+    height: 1px; background: var(--accent); opacity: 0.3;
+  }
+  .section-title {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 800; letter-spacing: -0.02em;
+    line-height: 1.05; margin-bottom: 16px;
+  }
+  .section-title em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-weight: 400; color: var(--accent);
+  }
+  .section-hook {
+    font-size: 16px; line-height: 1.65;
+    color: rgba(240,237,232,0.55);
+    max-width: 640px; margin-bottom: 64px;
+    font-weight: 400;
+  }
+  .section-hook strong { color: var(--text); font-weight: 600; }
+
+  /* TWO COL LAYOUT */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start;
+  }
+  .three-col {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;
+  }
+
+  /* POINTS LIST */
+  .points-list {
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .point-item {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .point-icon {
+    width: 6px; height: 6px; background: var(--accent);
+    border-radius: 50%; flex-shrink: 0; margin-top: 8px;
+  }
+  .point-text {
+    font-size: 14px; line-height: 1.7; color: rgba(240,237,232,0.7);
+  }
+  .point-text strong { color: var(--text); font-weight: 600; }
+
+  /* METRIC BLOCKS */
+  .metric-blocks { display: flex; flex-direction: column; gap: 2px; }
+  .metric-block {
+    background: var(--bg2); border: 1px solid var(--border);
+    padding: 24px 28px;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: border-color 0.2s;
+  }
+  .metric-block:hover { border-color: rgba(232,255,71,0.2); }
+  .mb-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .mb-val {
+    font-size: 24px; font-weight: 800;
+    color: var(--accent); letter-spacing: -0.02em;
+  }
+
+  /* TIMELINE */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .tl-item {
+    display: grid; grid-template-columns: 140px 1fr;
+    gap: 28px; padding: 24px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: start;
+  }
+  .tl-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); padding-top: 2px;
+  }
+  .tl-content {}
+  .tl-title {
+    font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--text);
+  }
+  .tl-desc {
+    font-size: 13px; color: var(--muted); line-height: 1.6;
+  }
+
+  /* INSTAGRAM EMBEDS */
+  .embed-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 24px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .embed-note::before {
+    content: ''; width: 6px; height: 6px;
+    background: #E1306C; border-radius: 50%;
+  }
+  .ig-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .ig-embed-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    overflow: hidden;
+    min-height: 520px;
+    display: flex; align-items: stretch;
+  }
+  .ig-embed-wrap blockquote {
+    margin: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* CALLOUT BOX */
+  .callout {
+    background: rgba(232,255,71,0.05);
+    border: 1px solid rgba(232,255,71,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 28px 32px;
+    margin: 40px 0;
+  }
+  .callout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px;
+  }
+  .callout-text {
+    font-size: 16px; line-height: 1.65; color: var(--text); font-weight: 500;
+  }
+
+  /* IMPACT GRID */
+  .impact-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+    margin-top: 48px;
+  }
+  .impact-item {
+    background: var(--bg2); border: 1px solid var(--border);
+    padding: 32px 28px;
+    transition: background 0.2s;
+  }
+  .impact-item:hover { background: var(--bg3); }
+  .impact-num {
+    font-size: 36px; font-weight: 800;
+    color: var(--accent); letter-spacing: -0.03em;
+    line-height: 1; margin-bottom: 8px;
+    display: block;
+  }
+  .impact-desc {
+    font-size: 13px; color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* COLLAB BADGES */
+  .collab-row {
+    display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 40px;
+  }
+  .collab-badge {
+    background: var(--bg2); border: 1px solid var(--border);
+    padding: 12px 20px;
+    font-size: 13px; font-weight: 600;
+    color: var(--text); letter-spacing: 0.02em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .collab-badge::before {
+    content: '✦'; font-size: 8px; color: var(--accent);
+  }
+
+  /* CTA FOOTER */
+  .case-footer {
+    background: var(--accent);
+    padding: 80px 52px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .cf-left {}
+  .cf-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(8,8,8,0.5); margin-bottom: 12px;
+  }
+  .cf-headline {
+    font-size: clamp(28px, 4vw, 52px);
+    font-weight: 800; letter-spacing: -0.03em;
+    color: var(--bg); line-height: 1;
+  }
+  .cf-headline em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-weight: 400;
+  }
+  .cf-right { display: flex; flex-direction: column; gap: 12px; }
+  .cf-btn {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 14px 28px; text-decoration: none;
+    display: inline-block; text-align: center;
+    transition: opacity 0.2s;
+  }
+  .cf-btn-dark { background: var(--bg); color: var(--accent); }
+  .cf-btn-outline {
+    background: transparent; color: var(--bg);
+    border: 1px solid rgba(8,8,8,0.3);
+  }
+  .cf-btn:hover { opacity: 0.8; }
+
+  /* PAGE FOOTER */
+  .page-footer {
+    background: var(--bg);
+    padding: 28px 52px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid var(--border);
+  }
+  .pf-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .pf-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none; transition: color 0.2s;
+  }
+  .pf-link:hover { color: var(--accent); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reveal {
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 20px; }
+    .case-hero { padding: 0 20px 60px; }
+    .hero-meta { flex-direction: column; }
+    .hero-meta-item { border-right: none; border-bottom: 1px solid var(--border); }
+    .summary-strip { grid-template-columns: repeat(2, 1fr); }
+    .sum-item:last-child { grid-column: span 2; }
+    .cs-section { padding: 64px 20px; }
+    .two-col { grid-template-columns: 1fr; gap: 40px; }
+    .three-col { grid-template-columns: 1fr; }
+    .ig-grid { grid-template-columns: 1fr; }
+    .impact-grid { grid-template-columns: 1fr 1fr; }
+    .case-footer { flex-direction: column; gap: 40px; padding: 60px 20px; }
+    .page-footer { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-back" href="kartik-portfolio.html"> Portfolio</a>
+  <div class="nav-brand">Kartik<span>.</span></div>
+  <a class="nav-hire" href="mailto:kartikjoshi305@gmail.com">Hire Me</a>
+</nav>
+
+<!-- HERO -->
+<section class="case-hero">
+  <div class="hero-bg-text">RXN</div>
+  <div class="hero-overline">
+    <span class="dot"></span>
+    Case Study · Growth Marketing · D2C Sports
+  </div>
+  <h1>
+    <span class="brand">RXN Sports</span>
+    <span class="sub">From Niche Brand to ₹50L in 30 Days</span>
+  </h1>
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <div class="meta-label">Industry</div>
+      <div class="meta-val">Combat Sports D2C</div>
+    </div>
+    <div class="hero-meta-item">
+      <div class="meta-label">Role</div>
+      <div class="meta-val">Growth Marketing Consultant</div>
+    </div>
+    <div class="hero-meta-item">
+      <div class="meta-label">Channels</div>
+      <div class="meta-val">Meta · Amazon · Instagram · Influencer</div>
+    </div>
+    <div class="hero-meta-item">
+      <div class="meta-label">Duration</div>
+      <div class="meta-val">Ongoing</div>
+    </div>
+  </div>
+</section>
+
+<!-- SUMMARY STRIP -->
+<div class="summary-strip">
+  <div class="sum-item">
+    <span class="sum-val">3,861+</span>
+    <span class="sum-desc">Meta Leads Generated</span>
+  </div>
+  <div class="sum-item">
+    <span class="sum-val">₹5.83</span>
+    <span class="sum-desc">Avg. Cost Per Lead</span>
+  </div>
+  <div class="sum-item">
+    <span class="sum-val">+29%</span>
+    <span class="sum-desc">Website Revenue in 3 Months</span>
+  </div>
+  <div class="sum-item">
+    <span class="sum-val">₹1L+</span>
+    <span class="sum-desc">From a 500-Follower Influencer</span>
+  </div>
+  <div class="sum-item">
+    <span class="sum-val">₹50L</span>
+    <span class="sum-desc">Amazon Sales in 30 Days</span>
+  </div>
+</div>
+
+<!-- SECTION 1: PERFORMANCE MARKETING -->
+<div class="cs-section reveal">
+  <div class="section-num">01 — Performance Marketing</div>
+  <h2 class="section-title">3,861 Leads.<br><em>₹5.83 Each.</em></h2>
+  <p class="section-hook">
+    Most brands burn budget chasing cold website traffic that never converts. We flipped the model — moving buyers directly into conversations before asking them to open their wallets.
+  </p>
+  <div class="two-col">
+    <div>
+      <div class="points-list">
+        <div class="point-item">
+          <div class="point-icon"></div>
+          <div class="point-text">Launched <strong>DM-focused Meta campaigns</strong> designed to intercept high-intent buyers at the moment of discovery — replacing passive clicks with active conversations.</div>
+        </div>
+        <div class="point-item">
+          <div class="point-icon"></div>
+          <div class="point-text"><strong>Abandoned cold traffic</strong> as a primary objective. Warm, pre-qualified buyers entering via DMs convert at a fundamentally higher rate than anonymous site visitors.</div>
+        </div>
+        <div class="point-item">
+          <div class="point-icon"></div>
+          <div class="point-text">Built a <strong>structured inbound pipeline</strong> — turning every lead into a tracked, qualified prospect with purchase intent established before any product page was visited.</div>
+        </div>
+        <div class="point-item">
+          <div class="point-icon"></div>
+          <div class="point-text">Ran continuous <strong>creative and audience testing</strong> — iterating on messaging, visuals, and targeting to compress CPL without sacrificing lead quality.</div>
+        </div>
+      </div>
+      <div class="callout">
+        <div class="callout-label">The Outcome</div>
+        <div class="callout-text">3,861 qualified leads. ₹5.83 average CPL. A scalable, repeatable inbound pipeline for a brand competing in a highly specific niche market.</div>
+      </div>
+    </div>
+    <div class="metric-blocks">
+      <div class="metric-block">
+        <span class="mb-label">Total Leads Generated</span>
+        <span class="mb-val">3,861+</span>
+      </div>
+      <div class="metric-block">
+        <span class="mb-label">Average Cost Per Lead</span>
+        <span class="mb-val">₹5.83</span>
+      </div>
+      <div class="metric-block">
+        <span class="mb-label">Campaign Type</span>
+        <span class="mb-val">DM Campaigns</span>
+      </div>
+      <div class="metric-block">
+        <span class="mb-label">Platform</span>
+        <span class="mb-val">Meta Ads</span>
+      </div>
+      <div class="metric-block">
+        <span class="mb-label">Lead Quality</span>
+        <span class="mb-val">High-Intent Buyers</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: MICRO INFLUENCER -->
+<div class="cs-section reveal">
+  <div class="section-num">02 — Micro-Influencer Strategy</div>
+  <h2 class="section-title">₹1,00,000+<br>From <em>500 Followers.</em></h2>
+  <p class="section-hook">
+    The industry obsesses over reach. We obsessed over <strong>relevance</strong>. One MMA athlete. One coupon code. One clear proof that credibility beats celebrity every time.
+  </p>
+  <div class="two-col">
+    <div>
+      <div class="points-list">
+        <div class="point-item">
+          <div class="point-icon"></div>
+          <div class="point-text">Identified and onboarded an <strong>MMA athlete from Bangalore</strong> with approximately 500 followers — an audience so tightly matched to RXN's product that every single follower was a potential buyer.</div>
+        </div>
+        <div class="point-item">
+          <div class="point-icon"></div>
+          <div class="point-text">Sent product (MRP ₹2,000) with zero upfront fee. Assigned a <strong>personalised coupon code: BADAL10</strong> — creating a trackable, attribution-ready revenue line from day one.</div>
+        </div>
+        <div class="point-item">
+          <div class="point-icon"></div>
+          <div class="point-text">Prioritised <strong>audience trust over audience size</strong>. A fighter recommending combat gear to fellow fighters is a peer endorsement — not an ad.</div>
+        </div>
+        <div class="point-item">
+          <div class="point-icon"></div>
+          <div class="point-text">Proved that <strong>hyper-relevant micro-influencers</strong> in niche markets can outperform macro-creators with 100x the following when the product-audience fit is tight enough.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-date">Day 7</div>
+          <div class="tl-content">
+            <div class="tl-title">First Conversion Recorded</div>
+            <div class="tl-desc">Within a week of posting, the first sale came in via the BADAL10 code — validating the niche audience fit immediately.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Months 2–3</div>
+          <div class="tl-content">
+            <div class="tl-title">Consistent Niche Engagement</div>
+            <div class="tl-desc">Steady stream of code redemptions from the combat sports community — organic, word-of-mouth driven, compounding.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">December Wk 1</div>
+          <div class="tl-content">
+            <div class="tl-title">₹1,00,000 Milestone Crossed</div>
+            <div class="tl-desc">A single creator with 500 followers crossed ₹1 lakh in revenue from one product code alone — 50+ redemptions, zero paid placement fee.</div>
+          </div>
+        </div>
+      </div>
+      <div class="impact-grid" style="margin-top:32px;">
+        <div class="impact-item">
+          <span class="impact-num">50+</span>
+          <div class="impact-desc">Code redemptions from a 500-follower account</div>
+        </div>
+        <div class="impact-item">
+          <span class="impact-num">₹1L+</span>
+          <div class="impact-desc">Revenue from a single influencer relationship</div>
+        </div>
+        <div class="impact-item">
+          <span class="impact-num">₹0</span>
+          <div class="impact-desc">Upfront influencer fee paid</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: WEBSITE GROWTH -->
+<div class="cs-section reveal">
+  <div class="section-num">03 — Conversion & Funnel Optimisation</div>
+  <h2 class="section-title">29% More Revenue.<br><em>3 Months.</em> No Budget Bloat.</h2>
+  <p class="section-hook">
+    Growing revenue isn't always about spending more — it's about spending smarter. A reworked funnel, disciplined retargeting, and data-driven offer testing compounded into a <strong>29% website sales lift</strong> without proportionally increasing ad spend.
+  </p>
+  <div class="two-col">
+    <div class="points-list">
+      <div class="point-item">
+        <div class="point-icon"></div>
+        <div class="point-text"><strong>Rebuilt the paid funnel</strong> from the ground up — mapping each campaign stage to the right buyer intent, eliminating wasted impressions at every step.</div>
+      </div>
+      <div class="point-item">
+        <div class="point-icon"></div>
+        <div class="point-text">Implemented <strong>structured retargeting sequences</strong> that re-engaged warm audiences with progressively stronger offers, pulling hesitant buyers back to purchase.</div>
+      </div>
+      <div class="point-item">
+        <div class="point-icon"></div>
+        <div class="point-text">Launched <strong>influencer-integrated discount mechanics</strong> — embedding coupon codes into the purchase flow to boost conversion at the final decision moment.</div>
+      </div>
+      <div class="point-item">
+        <div class="point-icon"></div>
+        <div class="point-text">Made <strong>every optimisation decision from performance data</strong>, not gut feel — killing underperformers fast and doubling down on proven creative-audience combinations.</div>
+      </div>
+    </div>
+    <div class="metric-blocks">
+      <div class="metric-block">
+        <span class="mb-label">Website Sales Growth</span>
+        <span class="mb-val">+29%</span>
+      </div>
+      <div class="metric-block">
+        <span class="mb-label">Timeframe</span>
+        <span class="mb-val">3 Months</span>
+      </div>
+      <div class="metric-block">
+        <span class="mb-label">Method</span>
+        <span class="mb-val">Funnel Overhaul + Retargeting</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: COUPON ATTRIBUTION -->
+<div class="cs-section reveal">
+  <div class="section-num">04 — Attribution & Influencer Ecosystem</div>
+  <h2 class="section-title">Every Rupee.<br><em>Tracked. Attributed.</em> Accountable.</h2>
+  <p class="section-hook">
+    Influencer marketing has a measurement problem. We solved it by building a <strong>coupon-led attribution system</strong> that turned every collaboration into a measurable ROI line — making partnership decisions data-backed, not instinct-backed.
+  </p>
+  <div class="two-col">
+    <div class="points-list">
+      <div class="point-item">
+        <div class="point-icon"></div>
+        <div class="point-text">Introduced <strong>influencer-branded coupon codes</strong> as the primary tracking mechanism — each creator gets a unique code, every sale gets a clean attribution source.</div>
+      </div>
+      <div class="point-item">
+        <div class="point-icon"></div>
+        <div class="point-text">Built <strong>lead-triggered discount flows</strong> — turning DM inquiries into conversion opportunities by arming the sales pipeline with dynamic offer mechanics.</div>
+      </div>
+      <div class="point-item">
+        <div class="point-icon"></div>
+        <div class="point-text">Created a <strong>measurable ROI framework per influencer</strong> — revenue generated, code redemptions, and conversion rate tracked for every partnership at a glance.</div>
+      </div>
+      <div class="point-item">
+        <div class="point-icon"></div>
+        <div class="point-text">Enabled <strong>data-driven partnership scaling</strong> — doubling down on high-performing creators and eliminating vanity collaborations that look impressive but deliver nothing.</div>
+      </div>
+    </div>
+    <div class="callout" style="margin:0; height:fit-content;">
+      <div class="callout-label">Why This Matters</div>
+      <div class="callout-text" style="font-size:15px;">Most brands can't tell you which influencer actually drove revenue. We built the system that made that question answerable — turning a guesswork channel into a predictable growth lever.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5: AMAZON -->
+<div class="cs-section reveal">
+  <div class="section-num">05 — Marketplace Growth</div>
+  <h2 class="section-title">₹50 Lakhs.<br><em>Amazon.</em> 30 Days.</h2>
+  <p class="section-hook">
+    Omnichannel isn't a buzzword — it's the compounding effect of every channel working in the same direction at the same time. Coordinated paid and influencer efforts fed directly into Amazon's ranking algorithms and buyer trust signals.
+  </p>
+  <div class="two-col">
+    <div class="points-list">
+      <div class="point-item">
+        <div class="point-icon"></div>
+        <div class="point-text">Aligned <strong>paid and influencer demand generation</strong> to feed directly into the Amazon channel — driving external traffic that amplified organic marketplace ranking.</div>
+      </div>
+      <div class="point-item">
+        <div class="point-icon"></div>
+        <div class="point-text"><strong>Coordinated website and marketplace strategy</strong> — ensuring neither channel cannibalised the other, but both compounded total brand revenue simultaneously.</div>
+      </div>
+      <div class="point-item">
+        <div class="point-icon"></div>
+        <div class="point-text">The <strong>₹50,00,000 milestone in 30 days</strong> was formally acknowledged by brand leadership as a significant commercial achievement for the brand's marketplace presence.</div>
+      </div>
+    </div>
+    <div class="metric-blocks">
+      <div class="metric-block">
+        <span class="mb-label">Amazon Revenue</span>
+        <span class="mb-val">₹50,00,000</span>
+      </div>
+      <div class="metric-block">
+        <span class="mb-label">Timeframe</span>
+        <span class="mb-val">30 Days</span>
+      </div>
+      <div class="metric-block">
+        <span class="mb-label">Approach</span>
+        <span class="mb-val">Omnichannel Alignment</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6: ORGANIC CONTENT -->
+<div class="cs-section reveal">
+  <div class="section-num">06 — Organic Content Strategy</div>
+  <h2 class="section-title">Content That<br><em>Earns Its Place</em><br>in the Feed.</h2>
+  <p class="section-hook">
+    Combat sports athletes don't want to be sold to — they want to be understood. We built content that <strong>lived inside their world</strong>, earning saves, shares, and DMs instead of chasing hollow impressions.
+  </p>
+  <div class="points-list" style="margin-bottom:48px;">
+    <div class="point-item">
+      <div class="point-icon"></div>
+      <div class="point-text">Developed a <strong>combat-sport-specific content strategy</strong> rooted in the actual culture of MMA and boxing — not generic sports brand aesthetics pasted over a new logo.</div>
+    </div>
+    <div class="point-item">
+      <div class="point-icon"></div>
+      <div class="point-text">Centred content around <strong>athlete storytelling and training journeys</strong> — creating an emotional connection between the brand and the daily grind of fighters.</div>
+    </div>
+    <div class="point-item">
+      <div class="point-icon"></div>
+      <div class="point-text">Measured success by <strong>saves, comments, and DMs</strong> — the engagement signals that indicate real intent — rather than vanity reach and passive likes.</div>
+    </div>
+    <div class="point-item">
+      <div class="point-icon"></div>
+      <div class="point-text">Positioned RXN <strong>as part of the athlete's journey</strong>, not just a product they buy — building the kind of brand recall that survives algorithm changes and ad fatigue.</div>
+    </div>
+  </div>
+
+  <div class="embed-note">Live Content — RXN Sports Instagram Reels</div>
+  <div class="ig-grid">
+    <div class="ig-embed-wrap">
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DLXtNXGsU9b/" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:100%;min-width:326px;padding:0;width:99.375%;width:-webkit-calc(100% - 2px);width:calc(100% - 2px);"></blockquote>
+    </div>
+    <div class="ig-embed-wrap">
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DSFmabgktDA/" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:100%;min-width:326px;padding:0;width:99.375%;width:-webkit-calc(100% - 2px);width:calc(100% - 2px);"></blockquote>
+    </div>
+    <div class="ig-embed-wrap">
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DPEZzpIgZPE/" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:100%;min-width:326px;padding:0;width:99.375%;width:-webkit-calc(100% - 2px);width:calc(100% - 2px);"></blockquote>
+    </div>
+    <div class="ig-embed-wrap">
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DO6dHZ4ExQC/" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:100%;min-width:326px;padding:0;width:99.375%;width:-webkit-calc(100% - 2px);width:calc(100% - 2px);"></blockquote>
+    </div>
+    <div class="ig-embed-wrap">
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DPY-dlqj-G5/" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:100%;min-width:326px;padding:0;width:99.375%;width:-webkit-calc(100% - 2px);width:calc(100% - 2px);"></blockquote>
+    </div>
+    <div class="ig-embed-wrap">
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DKo9mtitq1D/" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:100%;min-width:326px;padding:0;width:99.375%;width:-webkit-calc(100% - 2px);width:calc(100% - 2px);"></blockquote>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 7: COLLABORATIONS -->
+<div class="cs-section reveal">
+  <div class="section-num">07 — Strategic Brand Collaborations</div>
+  <h2 class="section-title">Beyond Retail.<br><em>Industry Player.</em></h2>
+  <p class="section-hook">
+    Brand authority in niche markets isn't built through ads alone — it's built through <strong>who you stand next to</strong>. By aligning RXN with the most respected institutions in combat sports, we elevated the brand from a product to a name fighters trust.
+  </p>
+
+  <div class="collab-row">
+    <div class="collab-badge">Sting Sports — World-Renowned Boxing Equipment Manufacturer</div>
+    <div class="collab-badge">Boxing Federation of India (BFI)</div>
+    <div class="collab-badge">Official Indian Boxing Tournaments</div>
+  </div>
+
+  <div class="points-list" style="margin-bottom:48px;">
+    <div class="point-item">
+      <div class="point-icon"></div>
+      <div class="point-text">Secured collaboration with <strong>Sting Sports</strong> — a globally recognised boxing equipment manufacturer — lending RXN an immediate tier of credibility that years of advertising alone couldn't purchase.</div>
+    </div>
+    <div class="point-item">
+      <div class="point-icon"></div>
+      <div class="point-text">Associated with the <strong>Boxing Federation of India</strong> for official Indian tournaments — positioning RXN alongside the governing body of the sport itself.</div>
+    </div>
+    <div class="point-item">
+      <div class="point-icon"></div>
+      <div class="point-text">Elevated <strong>athlete trust and institutional legitimacy</strong> — when serious fighters see a brand at the national competition level, the purchase decision becomes a matter of professional identity, not comparison shopping.</div>
+    </div>
+    <div class="point-item">
+      <div class="point-icon"></div>
+      <div class="point-text">Shifted brand perception from <strong>e-commerce store to industry stakeholder</strong> — a transformation that compounds across every marketing channel, making every ad, every post, and every influencer endorsement more credible.</div>
+    </div>
+  </div>
+
+  <div class="embed-note">Collaboration Content — Live on Instagram</div>
+  <div class="ig-grid" style="grid-template-columns: repeat(3,1fr);">
+    <div class="ig-embed-wrap">
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DRSOTbNFHsM/" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:100%;min-width:326px;padding:0;width:99.375%;width:-webkit-calc(100% - 2px);width:calc(100% - 2px);"></blockquote>
+    </div>
+    <div class="ig-embed-wrap">
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DQ6onMmkc_R/" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:100%;min-width:326px;padding:0;width:99.375%;width:-webkit-calc(100% - 2px);width:calc(100% - 2px);"></blockquote>
+    </div>
+    <div class="ig-embed-wrap">
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DQ37ijWETzH/" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:100%;min-width:326px;padding:0;width:99.375%;width:-webkit-calc(100% - 2px);width:calc(100% - 2px);"></blockquote>
+    </div>
+  </div>
+</div>
+
+<!-- CTA FOOTER -->
+<div class="case-footer">
+  <div class="cf-left">
+    <div class="cf-label">Liked What You Saw?</div>
+    <h2 class="cf-headline">Let's build<br>your <em>growth story.</em></h2>
+  </div>
+  <div class="cf-right">
+    <a class="cf-btn cf-btn-dark" href="mailto:kartikjoshi305@gmail.com">Get in Touch →</a>
+    <a class="cf-btn cf-btn-outline" href="kartik-portfolio.html">← Back to Portfolio</a>
+  </div>
+</div>
+
+<footer class="page-footer">
+  <div class="pf-copy">© 2025 Kartik Joshi · Growth Marketing</div>
+  <a class="pf-link" href="#top">Back to Top ↑</a>
+</footer>
+
+<!-- Instagram Embed Script -->
+<script async src="//www.instagram.com/embed.js"></script>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.06 });
+  reveals.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
